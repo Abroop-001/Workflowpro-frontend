@@ -35,7 +35,7 @@ const Input = forwardRef(function Input(
             transition-all duration-150 outline-none
             ${error
               ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100'
-              : 'border-gray-200 focus:border-[#0f62fe] focus:ring-2 focus:ring-[#0f62fe]/10'
+              : 'border-gray-200 focus:border-[#C9A86A] focus:ring-2 focus:ring-[#C9A86A]/10'
             }
             ${LeftIcon ? 'pl-9' : 'pl-3'}
             ${RightIcon ? 'pr-9' : 'pr-3'}

@@ -6,4 +6,5 @@ export const shiftApi = {
   create:       (data)     => api.post('/shifts', data),
   update:       (id, data) => api.patch(`/shifts/${id}`, data),
   deactivate:   (id)       => api.patch(`/shifts/${id}/deactivate`),
+  delete:       (id)       => api.delete(`/shifts/${id}`),
 };

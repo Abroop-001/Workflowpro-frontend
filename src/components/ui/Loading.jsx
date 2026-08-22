@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react';
 export default function Loading({ message = 'Loading...', fullScreen = false }) {
   const content = (
     <div className="flex flex-col items-center gap-3">
-      <Loader2 size={22} className="animate-spin text-[#0f62fe]" />
+      <Loader2 size={22} className="animate-spin text-[#C9A86A]" />
       <p className="text-sm text-gray-500">{message}</p>
     </div>
   );

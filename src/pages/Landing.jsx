@@ -125,8 +125,8 @@ const STATS = [
 // ─── Components ─────────────────────────────────────────────────────────────────
 function SectionLabel({ children }) {
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0f62fe] uppercase tracking-wider mb-3">
-      <span className="w-4 h-px bg-[#0f62fe]" />
+    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#C9A86A] uppercase tracking-wider mb-3">
+      <span className="w-4 h-px bg-[#C9A86A]" />
       {children}
     </span>
   );
@@ -135,8 +135,8 @@ function SectionLabel({ children }) {
 function FeatureCard({ icon: Icon, title, description }) {
   return (
     <div className="group p-5 rounded-xl border border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm transition-all duration-200">
-      <div className="w-9 h-9 rounded-lg bg-[#eef4ff] flex items-center justify-center mb-4 group-hover:bg-[#0f62fe] transition-colors duration-200">
-        <Icon size={17} className="text-[#0f62fe] group-hover:text-white transition-colors duration-200" />
+      <div className="w-9 h-9 rounded-lg bg-[#C9A86A]/10 flex items-center justify-center mb-4 group-hover:bg-[#C9A86A] transition-colors duration-200">
+        <Icon size={17} className="text-[#C9A86A] group-hover:text-[#111111] transition-colors duration-200" />
       </div>
       <h3 className="text-sm font-semibold text-gray-900 mb-1.5">{title}</h3>
       <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
@@ -151,7 +151,7 @@ export default function Landing() {
       {/* ── Hero ─────────────────────────────────────────────────────────────── */}
       <section className="pt-32 pb-20 px-5">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-[#eef4ff] text-[#0f62fe] text-xs font-medium px-3 py-1.5 rounded-full mb-8 border border-[#0f62fe]/10">
+          <div className="inline-flex items-center gap-2 bg-[#C9A86A]/10 text-[#C9A86A] text-xs font-medium px-3 py-1.5 rounded-full mb-8 border border-[#C9A86A]/20">
             <Building2 size={12} />
             Trusted by 500+ companies
           </div>
@@ -159,7 +159,7 @@ export default function Landing() {
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 leading-[1.12] tracking-tight mb-6">
             The HR platform your
             <br />
-            <span className="text-[#0f62fe]">team actually uses</span>
+            <span className="text-[#C9A86A]">team actually uses</span>
           </h1>
 
           <p className="text-base text-gray-500 leading-relaxed max-w-xl mx-auto mb-10">
@@ -169,7 +169,7 @@ export default function Landing() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link to="/register">
-              <Button size="lg" className="gap-2">
+              <Button variant="gold" size="lg" className="gap-2">
                 Create your company
                 <ArrowRight size={14} />
               </Button>
@@ -234,10 +234,10 @@ export default function Landing() {
 
             {STEPS.map((item, i) => (
               <div key={item.step} className="relative flex flex-col items-center text-center p-6">
-                <div className="w-14 h-14 rounded-full bg-white border-2 border-gray-100 flex items-center justify-center mb-5 shadow-sm z-10">
-                  <span className="text-sm font-bold text-[#0f62fe]">{item.step}</span>
+                <div className="flex items-center gap-4.5">
+                  <span className="text-sm font-bold text-[#C9A86A]">{item.step}</span>
+                  <h3 className="text-sm font-semibold text-gray-900">{item.title}</h3>
                 </div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">{item.title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">{item.description}</p>
                 {i < STEPS.length - 1 && (
                   <ChevronRight
@@ -270,8 +270,8 @@ export default function Landing() {
                 key={title}
                 className="flex gap-4 p-5 bg-white border border-gray-100 rounded-xl hover:shadow-sm transition-shadow"
               >
-                <div className="w-9 h-9 rounded-lg bg-[#eef4ff] flex items-center justify-center flex-shrink-0">
-                  <Icon size={17} className="text-[#0f62fe]" />
+                <div className="w-9 h-9 rounded-lg bg-[#C9A86A]/10 flex items-center justify-center mb-4">
+                  <Icon size={17} className="text-[#C9A86A]" />
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900 mb-1">{title}</h3>
@@ -326,7 +326,7 @@ export default function Landing() {
                   <input
                     type="text"
                     placeholder="John"
-                    className="px-3 py-2 text-sm border border-gray-200 rounded-md outline-none focus:border-[#0f62fe] focus:ring-2 focus:ring-[#0f62fe]/10 transition-all"
+                    className="px-3 py-2 text-sm border border-gray-200 rounded-md outline-none focus:border-[#C9A86A] focus:ring-2 focus:ring-[#C9A86A]/10 transition-all"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -334,7 +334,7 @@ export default function Landing() {
                   <input
                     type="text"
                     placeholder="Doe"
-                    className="px-3 py-2 text-sm border border-gray-200 rounded-md outline-none focus:border-[#0f62fe] focus:ring-2 focus:ring-[#0f62fe]/10 transition-all"
+                    className="px-3 py-2 text-sm border border-gray-200 rounded-md outline-none focus:border-[#C9A86A] focus:ring-2 focus:ring-[#C9A86A]/10 transition-all"
                   />
                 </div>
               </div>
@@ -343,7 +343,7 @@ export default function Landing() {
                 <input
                   type="email"
                   placeholder="john@company.com"
-                  className="px-3 py-2 text-sm border border-gray-200 rounded-md outline-none focus:border-[#0f62fe] focus:ring-2 focus:ring-[#0f62fe]/10 transition-all"
+                  className="px-3 py-2 text-sm border border-gray-200 rounded-md outline-none focus:border-[#C9A86A] focus:ring-2 focus:ring-[#C9A86A]/10 transition-all"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
@@ -351,7 +351,7 @@ export default function Landing() {
                 <input
                   type="text"
                   placeholder="Acme Inc."
-                  className="px-3 py-2 text-sm border border-gray-200 rounded-md outline-none focus:border-[#0f62fe] focus:ring-2 focus:ring-[#0f62fe]/10 transition-all"
+                  className="px-3 py-2 text-sm border border-gray-200 rounded-md outline-none focus:border-[#C9A86A] focus:ring-2 focus:ring-[#C9A86A]/10 transition-all"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
@@ -359,7 +359,7 @@ export default function Landing() {
                 <textarea
                   rows={4}
                   placeholder="Tell us about your team and what you need..."
-                  className="px-3 py-2 text-sm border border-gray-200 rounded-md outline-none focus:border-[#0f62fe] focus:ring-2 focus:ring-[#0f62fe]/10 transition-all resize-none"
+                  className="px-3 py-2 text-sm border border-gray-200 rounded-md outline-none focus:border-[#C9A86A] focus:ring-2 focus:ring-[#C9A86A]/10 transition-all resize-none"
                 />
               </div>
               <Button type="submit" size="md">
@@ -371,19 +371,20 @@ export default function Landing() {
       </section>
 
       {/* ── CTA ──────────────────────────────────────────────────────────────── */}
-      <section className="py-16 px-5 bg-[#0f62fe]">
+      <section className="py-16 px-5 bg-[#0B0B0B] border-t border-[#C9A86A]/10 border-b">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-2xl font-bold text-white mb-3 tracking-tight">
             Ready to modernize your HR?
           </h2>
-          <p className="text-sm text-blue-100 mb-8">
+          <p className="text-sm text-gray-400 mb-8">
             Join hundreds of companies already managing their teams with WorkflowPro.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link to="/register">
               <Button
+                variant="gold"
                 size="lg"
-                className="bg-white text-[#0f62fe] hover:bg-blue-50 border-transparent"
+                className="gap-2"
               >
                 Create your company
                 <ArrowRight size={14} />

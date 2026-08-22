@@ -39,9 +39,9 @@ export default function RecruitmentPage() {
     setLoading(true);
     try {
       const candRes = await recruitmentApi.getCandidates(filters);
-      setCandidates(candRes.candidates || candRes.data || candRes.data?.candidates || []);
+      setCandidates(candRes.data?.data?.candidates || candRes.data?.candidates || candRes.candidates || []);
       const deptRes = await departmentApi.getAll();
-      setDepartments(deptRes.departments || deptRes.data || deptRes.data?.departments || []);
+      setDepartments(deptRes.data?.data?.departments || deptRes.data?.departments || deptRes.departments || []);
     } catch (err) {
       error('Failed to load recruitment data');
     } finally {
@@ -85,7 +85,7 @@ export default function RecruitmentPage() {
     try {
       const res = await recruitmentApi.addNote(selectedCandidate._id, newNote);
       success('Note added');
-      setSelectedCandidate(res.candidate || res.data?.candidate || res);
+      setSelectedCandidate(res.data?.data?.candidate || res.data?.candidate || res.candidate || res);
       setNewNote('');
     } catch (err) {
       error('Failed to add note');

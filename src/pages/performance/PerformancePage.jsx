@@ -30,6 +30,7 @@ export default function PerformancePage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isSelfOpen, setIsSelfOpen] = useState(false);
   const [isManagerOpen, setIsManagerOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   // Forms
   const [createForm, setCreateForm] = useState({
@@ -38,6 +39,10 @@ export default function PerformancePage() {
   });
   const [selfForm, setSelfForm] = useState({ rating: 5, comments: '' });
   const [managerForm, setManagerForm] = useState({ rating: 5, comments: '' });
+  const [editForm, setEditForm] = useState({
+    reviewPeriod: '',
+    goals: [{ title: '', description: '', status: 'PENDING' }]
+  });
 
   // Load My / Staff Reviews
   const loadReviews = async () => {
@@ -118,6 +123,38 @@ export default function PerformancePage() {
     }
   };
 
+  const handleEditClick = (rev) => {
+    setSelectedReview(rev);
+    setEditForm({
+      reviewPeriod: rev.reviewPeriod,
+      goals: rev.goals.map(g => ({ title: g.title, description: g.description || '', status: g.status || 'PENDING' }))
+    });
+    setIsEditOpen(true);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await performanceApi.update(selectedReview._id, editForm);
+      success('Performance review updated successfully!');
+      setIsEditOpen(false);
+      loadReviews();
+    } catch (err) {
+      error(err.response?.data?.message || 'Failed to update review');
+    }
+  };
+
+  const handleDeleteClick = async (revId) => {
+    if (!window.confirm('Are you sure you want to delete this performance review cycle?')) return;
+    try {
+      await performanceApi.delete(revId);
+      success('Performance review cycle deleted successfully!');
+      loadReviews();
+    } catch (err) {
+      error(err.response?.data?.message || 'Failed to delete review');
+    }
+  };
+
   return (
     <div>
       <div className="page-header">
@@ -165,7 +202,7 @@ export default function PerformancePage() {
                   <h3 style={{ fontSize: '15px', fontWeight: 600, margin: 0 }}>Review Cycle: {rev.reviewPeriod}</h3>
                   <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>Status: <StatusBadge status={rev.status} /></p>
                 </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   {!isStaff && rev.status === 'SELF_REVIEW' && (
                     <Button onClick={() => { setSelectedReview(rev); setIsSelfOpen(true); }} style={{ padding: '6px 12px', fontSize: '12px' }}>
                       Submit Self Evaluation
@@ -175,6 +212,16 @@ export default function PerformancePage() {
                     <Button variant="success" onClick={() => { setSelectedReview(rev); setIsManagerOpen(true); }} style={{ padding: '6px 12px', fontSize: '12px' }}>
                       Submit Manager Review
                     </Button>
+                  )}
+                  {isStaff && (user?.role === 'HR' || user?.role === 'COMPANY_ADMIN') && (
+                    <>
+                      <Button variant="secondary" onClick={() => handleEditClick(rev)} style={{ padding: '6px 12px', fontSize: '12px' }}>
+                        Edit Goals
+                      </Button>
+                      <Button variant="danger" onClick={() => handleDeleteClick(rev._id)} style={{ padding: '6px 12px', fontSize: '12px' }}>
+                        Delete
+                      </Button>
+                    </>
                   )}
                 </div>
               </div>
@@ -290,6 +337,38 @@ export default function PerformancePage() {
             </div>
             <Input label="Manager Remarks / Feedback" required placeholder="Describe strengths, opportunities, and overall assessment..." value={managerForm.comments} onChange={e => setManagerForm(prev => ({ ...prev, comments: e.target.value }))} />
             <Button type="submit" variant="success">Submit evaluation</Button>
+          </form>
+        </Modal>
+      )}
+
+      {/* Edit Cycle Modal */}
+      {selectedReview && (
+        <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="Edit Performance Review Cycle">
+          <form onSubmit={handleEditSubmit} className="flex flex-col gap-4">
+            <Input label="Review Period" required placeholder="e.g. 2026-Q1" value={editForm.reviewPeriod} onChange={e => setEditForm(prev => ({ ...prev, reviewPeriod: e.target.value }))} />
+            
+            <div>
+              <label className="input-label" style={{ display: 'block', marginBottom: '6px' }}>Key Goals</label>
+              {editForm.goals.map((g, i) => (
+                <div key={i} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                  <Input placeholder="Goal Title" required value={g.title} onChange={e => {
+                    const updated = [...editForm.goals];
+                    updated[i].title = e.target.value;
+                    setEditForm(prev => ({ ...prev, goals: updated }));
+                  }} style={{ flex: 1 }} />
+                  <Input placeholder="Goal Description" value={g.description} onChange={e => {
+                    const updated = [...editForm.goals];
+                    updated[i].description = e.target.value;
+                    setEditForm(prev => ({ ...prev, goals: updated }));
+                  }} style={{ flex: 2 }} />
+                </div>
+              ))}
+              <Button type="button" variant="secondary" onClick={() => setEditForm(prev => ({ ...prev, goals: [...prev.goals, { title: '', description: '', status: 'PENDING' }] }))} style={{ padding: '6px 12px', fontSize: '11px', marginTop: '4px' }}>
+                + Add Goal
+              </Button>
+            </div>
+
+            <Button type="submit" style={{ marginTop: '12px' }}>Save Changes</Button>
           </form>
         </Modal>
       )}

@@ -45,7 +45,7 @@ export default function Login() {
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-[#0f62fe] rounded-md flex items-center justify-center">
+            <div className="w-8 h-8 bg-[#C9A86A] rounded-md flex items-center justify-center">
               <Layers size={16} className="text-white" />
             </div>
             <span className="font-semibold text-gray-900 text-base">WorkflowPro</span>
@@ -85,7 +85,7 @@ export default function Login() {
                 </label>
                 <button
                   type="button"
-                  className="text-xs text-[#0f62fe] hover:text-[#0353e9] font-medium transition-colors"
+                  className="text-xs text-[#C9A86A] hover:text-[#B89455] font-medium transition-colors"
                 >
                   Forgot password?
                 </button>
@@ -101,7 +101,7 @@ export default function Login() {
                   value={form.password}
                   onChange={handleChange}
                   autoComplete="current-password"
-                  className="w-full pl-9 pr-10 py-2 text-sm border border-gray-200 rounded-md outline-none focus:border-[#0f62fe] focus:ring-2 focus:ring-[#0f62fe]/10 transition-all"
+                  className="w-full pl-9 pr-10 py-2 text-sm border border-gray-200 rounded-md outline-none focus:border-[#C9A86A] focus:ring-2 focus:ring-[#C9A86A]/10 transition-all"
                 />
                 <button
                   type="button"
@@ -120,7 +120,7 @@ export default function Login() {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300 text-[#0f62fe] accent-[#0f62fe] cursor-pointer"
+                className="w-4 h-4 rounded border-gray-300 text-[#C9A86A] accent-[#C9A86A] cursor-pointer"
               />
               <label htmlFor="remember" className="text-sm text-gray-600 cursor-pointer">
                 Keep me signed in
@@ -136,7 +136,7 @@ export default function Login() {
             Don&apos;t have an account?{' '}
             <Link
               to="/register"
-              className="text-[#0f62fe] hover:text-[#0353e9] font-medium transition-colors"
+              className="text-[#C9A86A] hover:text-[#B89455] font-medium transition-colors"
             >
               Register your company
             </Link>

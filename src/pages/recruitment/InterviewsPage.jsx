@@ -37,11 +37,11 @@ export default function InterviewsPage() {
     setLoading(true);
     try {
       const intRes = await recruitmentApi.getInterviews();
-      setInterviews(intRes.interviews || intRes.data || intRes.data?.interviews || []);
+      setInterviews(intRes.data?.data?.interviews || intRes.data?.interviews || intRes.interviews || []);
       const candRes = await recruitmentApi.getCandidates();
-      setCandidates(candRes.candidates || candRes.data || candRes.data?.candidates || []);
+      setCandidates(candRes.data?.data?.candidates || candRes.data?.candidates || candRes.candidates || []);
       const empRes = await employeeApi.getAll({ status: 'ACTIVE' });
-      setEmployees(empRes.employees || empRes.data || empRes.data?.employees || []);
+      setEmployees(empRes.data?.data?.employees || empRes.data?.employees || empRes.employees || []);
     } catch (err) {
       error('Failed to load interviews data');
     } finally {

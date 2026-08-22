@@ -34,7 +34,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="flex items-center gap-2.5 mb-4">
-              <div className="w-7 h-7 bg-[#0f62fe] rounded-md flex items-center justify-center">
+              <div className="w-7 h-7 bg-[#C9A86A] rounded-md flex items-center justify-center">
                 <Layers size={14} className="text-white" />
               </div>
               <span className="font-semibold text-gray-900 text-[15px]">WorkflowPro</span>

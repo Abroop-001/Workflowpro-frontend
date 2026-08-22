@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Building2, User, Mail, Lock, Eye, EyeOff, Layers, CheckCircle2 } from 'lucide-react';
 import { authApi } from '../api/auth';
+import { useAuth } from '../context/AuthContext';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 
@@ -13,6 +14,7 @@ const PERKS = [
 
 export default function Register() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [form, setForm] = useState({
     companyName: '',
@@ -83,13 +85,13 @@ export default function Register() {
     setLoading(true);
 
     try {
+      // Register the company
       await authApi.register(form);
 
-      navigate('/login', {
-        state: {
-          message: 'Company registered successfully. Please login.',
-        },
-      });
+      // Auto-login with the same credentials so the user lands directly in the dashboard
+      await login({ email: form.email, password: form.password });
+
+      navigate('/dashboard');
 
     } catch (err) {
       setError(
@@ -109,7 +111,7 @@ export default function Register() {
         <div className="hidden md:flex flex-col pt-4">
 
           <Link to="/" className="flex items-center gap-2.5 mb-10">
-            <div className="w-8 h-8 bg-[#0f62fe] rounded-md flex items-center justify-center">
+            <div className="w-8 h-8 bg-[#C9A86A] rounded-md flex items-center justify-center">
               <Layers size={16} className="text-white" />
             </div>
 
@@ -136,7 +138,7 @@ export default function Register() {
 
                 <CheckCircle2
                   size={16}
-                  className="text-[#0f62fe] mt-0.5"
+                  className="text-[#C9A86A] mt-0.5"
                 />
 
                 <span className="text-sm text-gray-600">
@@ -238,7 +240,7 @@ export default function Register() {
                   className={`w-full pl-9 pr-10 py-2 text-sm border rounded-md outline-none transition-all ${
                     fieldErrors.password
                       ? 'border-red-400 focus:border-red-500'
-                      : 'border-gray-200 focus:border-[#0f62fe]'
+                      : 'border-gray-200 focus:border-[#C9A86A]'
                   }`}
                 />
 
@@ -283,7 +285,7 @@ export default function Register() {
 
             <Link
               to="/login"
-              className="text-[#0f62fe] font-medium"
+              className="text-[#C9A86A] font-medium"
             >
               Sign in
             </Link>

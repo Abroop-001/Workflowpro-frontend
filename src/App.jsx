@@ -20,6 +20,7 @@ import PayrollPage from './pages/payroll/PayrollPage';
 import RecruitmentPage from './pages/recruitment/RecruitmentPage';
 import InterviewsPage from './pages/recruitment/InterviewsPage';
 import PerformancePage from './pages/performance/PerformancePage';
+import ShiftsPage from './pages/shifts/ShiftsPage';
 import NotFound from './pages/NotFound';
 
 function ComingSoon({ title }) {
@@ -63,7 +64,7 @@ export default function App() {
               <Route path="/payroll" element={<PayrollPage />} />
               <Route path="/recruitment" element={<RecruitmentPage />} />
               <Route path="/interviews" element={<InterviewsPage />} />
-              <Route path="/shifts" element={<ComingSoon title="Shifts" />} />
+              <Route path="/shifts" element={<ShiftsPage />} />
               <Route path="/performance" element={<PerformancePage />} />
               <Route path="/audit-logs" element={<ComingSoon title="Audit Logs" />} />
             </Route>

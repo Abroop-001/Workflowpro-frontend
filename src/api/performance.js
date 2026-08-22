@@ -7,4 +7,6 @@ export const performanceApi = {
   submitSelfReview:     (id, data) => api.patch(`/performance/${id}/self-review`, data),
   submitManagerReview:  (id, data) => api.patch(`/performance/${id}/manager-review`, data),
   updateGoalStatus:     (id, data) => api.patch(`/performance/${id}/goals`, data),
+  update:               (id, data) => api.patch(`/performance/${id}`, data),
+  delete:               (id)       => api.delete(`/performance/${id}`),
 };

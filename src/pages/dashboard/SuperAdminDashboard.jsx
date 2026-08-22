@@ -147,117 +147,185 @@ export default function SuperAdminDashboard() {
       </div>
 
       {activeTab === 'directory' && (
-        <div style={{ display: 'grid', gridTemplateColumns: selectedCompany ? '3fr 2fr' : '1fr', gap: '24px', alignItems: 'start' }}>
-          
-          {/* Company Listing list */}
-          <Card className="card-padded-lg">
-            <div style={{ display: 'flex', gap: '16px', marginBottom: '20px', flexWrap: 'wrap' }}>
-              <div style={{ flex: 1, minWidth: '200px', position: 'relative' }}>
-                <Input
-                  placeholder="Search by company name or email..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{ paddingLeft: '36px' }}
-                />
-                <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
-              </div>
-              <div style={{ width: '180px' }}>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="input-field"
-                  style={{ height: '38px' }}
-                >
-                  <option value="">All Statuses</option>
-                  <option value="ACTIVE">Active</option>
-                  <option value="SUSPENDED">Suspended</option>
-                </select>
-              </div>
+        <div>
+          {/* Search & Filter Bar */}
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
+              <Input
+                placeholder="Search by company name or email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ paddingLeft: '36px' }}
+              />
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            </div>
+            <div style={{ width: '180px' }}>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="input-field"
+                style={{ height: '38px' }}
+              >
+                <option value="">All Statuses</option>
+                <option value="ACTIVE">Active</option>
+                <option value="SUSPENDED">Suspended</option>
+              </select>
+            </div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '13px', whiteSpace: 'nowrap' }}>
+              {companies.length} {companies.length === 1 ? 'company' : 'companies'}
+            </div>
+          </div>
+
+          {/* Loading State */}
+          {fetchCompaniesApi.loading && companies.length === 0 ? (
+            <div style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              padding: '80px 20px', background: 'var(--surface)', border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-lg)'
+            }}>
+              <Spinner />
+              <p style={{ color: 'var(--text-muted)', marginTop: '16px', fontSize: '14px' }}>Loading companies...</p>
             </div>
 
-            {fetchCompaniesApi.loading && companies.length === 0 ? (
-              <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
-                <Spinner />
+          /* Empty State */
+          ) : companies.length === 0 ? (
+            <div style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              padding: '80px 20px', background: 'var(--surface)', border: '1px dashed var(--border-strong)',
+              borderRadius: 'var(--radius-lg)'
+            }}>
+              <div style={{
+                width: '64px', height: '64px', borderRadius: '16px',
+                background: 'rgba(201, 168, 106, 0.08)', border: '1px solid rgba(201, 168, 106, 0.15)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px'
+              }}>
+                <Building size={28} style={{ color: '#C9A86A', opacity: 0.6 }} />
               </div>
-            ) : companies.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
-                <Building size={48} style={{ opacity: 0.3, marginBottom: '12px' }} />
-                <p style={{ margin: 0 }}>No companies registered yet.</p>
-              </div>
-            ) : (
-              <div className="table-responsive">
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Company Name</th>
-                      <th>Email</th>
-                      <th>Domain</th>
-                      <th>Status</th>
-                      <th style={{ textAlign: 'right' }}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {companies.map((company) => (
-                      <tr 
-                        key={company._id} 
-                        style={{ cursor: 'pointer', background: selectedCompany?._id === company._id ? 'var(--bg-hover)' : 'transparent' }}
-                        onClick={() => handleSelectCompany(company)}
-                      >
-                        <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{company.name}</td>
-                        <td>{company.email}</td>
-                        <td>{company.domain || 'N/A'}</td>
-                        <td>
-                          <span className={`badge ${company.status === 'SUSPENDED' ? 'badge-danger' : 'badge-success'}`}>
-                            {company.status || 'ACTIVE'}
-                          </span>
-                        </td>
-                        <td style={{ textAlign: 'right' }} onClick={(e) => e.stopPropagation()}>
-                          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                            <Button 
-                              variant="secondary" 
-                              style={{ padding: '4px 8px', minWidth: 'unset', height: '28px' }} 
-                              onClick={() => handleSelectCompany(company)}
-                            >
-                              <Edit3 size={13} />
-                            </Button>
-                            <Button 
-                              variant={company.status === 'SUSPENDED' ? 'success' : 'danger'}
-                              style={{ padding: '4px 8px', minWidth: 'unset', height: '28px' }} 
-                              onClick={() => handleToggleStatus(company)}
-                            >
-                              {company.status === 'SUSPENDED' ? <Power size={13} /> : <PowerOff size={13} />}
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </Card>
+              <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '15px', fontWeight: 500 }}>No companies registered yet</p>
+              <p style={{ color: 'var(--text-muted)', margin: '6px 0 0', fontSize: '13px' }}>Create your first company tenant to get started.</p>
+            </div>
 
-          {/* Details & Edit Panel */}
+          /* Company Card Grid */
+          ) : (
+            <div className="sa-company-grid">
+              {companies.map((company) => {
+                const isActive = company.status !== 'SUSPENDED';
+                const isSelected = selectedCompany?._id === company._id;
+                const initials = (company.name || '??').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+
+                return (
+                  <div
+                    key={company._id}
+                    className={`sa-company-card ${isSelected ? 'sa-company-card--selected' : ''}`}
+                    onClick={() => handleSelectCompany(company)}
+                  >
+                    {/* Card Header */}
+                    <div className="sa-company-card__header">
+                      <div className="sa-company-card__avatar">
+                        {initials}
+                      </div>
+                      <div className="sa-company-card__title-group">
+                        <h3 className="sa-company-card__name">{company.name}</h3>
+                        <p className="sa-company-card__domain">{company.domain || 'No domain'}</p>
+                      </div>
+                      <span className={`sa-status-badge ${isActive ? 'sa-status-badge--active' : 'sa-status-badge--suspended'}`}>
+                        <span className="sa-status-badge__dot" />
+                        {isActive ? 'Active' : 'Suspended'}
+                      </span>
+                    </div>
+
+                    {/* Card Body */}
+                    <div className="sa-company-card__body">
+                      <div className="sa-company-card__info-row">
+                        <span className="sa-company-card__info-label">Email</span>
+                        <span className="sa-company-card__info-value">{company.email}</span>
+                      </div>
+                      <div className="sa-company-card__info-row">
+                        <span className="sa-company-card__info-label">Phone</span>
+                        <span className="sa-company-card__info-value">{company.phone || '—'}</span>
+                      </div>
+                      <div className="sa-company-card__info-row">
+                        <span className="sa-company-card__info-label">Address</span>
+                        <span className="sa-company-card__info-value">
+                          {typeof company.address === 'string'
+                            ? (company.address || '—')
+                            : company.address
+                              ? `${company.address.street || ''}, ${company.address.city || ''}`
+                              : '—'
+                          }
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Card Footer Actions */}
+                    <div className="sa-company-card__footer" onClick={(e) => e.stopPropagation()}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSelectCompany(company)}
+                        style={{ flex: 1 }}
+                      >
+                        <Edit3 size={13} /> Details
+                      </Button>
+                      <Button
+                        variant={isActive ? 'danger' : 'primary'}
+                        size="sm"
+                        onClick={() => handleToggleStatus(company)}
+                        style={{ flex: 1 }}
+                      >
+                        {isActive ? <><PowerOff size={13} /> Suspend</> : <><Power size={13} /> Activate</>}
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Details & Edit Panel (below grid) */}
           {selectedCompany && (
-            <Card className="card-padded-lg" style={{ position: 'sticky', top: '24px' }}>
+            <Card className="card-padded-lg" style={{ marginTop: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h3 style={{ fontSize: '16px', fontWeight: 600, margin: 0 }}>Company details</h3>
-                <span className={`badge ${selectedCompany.status === 'SUSPENDED' ? 'badge-danger' : 'badge-success'}`}>
-                  {selectedCompany.status || 'ACTIVE'}
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div className="sa-company-card__avatar" style={{ width: '36px', height: '36px', fontSize: '13px' }}>
+                    {(selectedCompany.name || '??').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()}
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '16px', fontWeight: 600, margin: 0, color: 'var(--text-primary)' }}>
+                      {selectedCompany.name}
+                    </h3>
+                    <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: 0 }}>Company Details</p>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span className={`sa-status-badge ${selectedCompany.status === 'SUSPENDED' ? 'sa-status-badge--suspended' : 'sa-status-badge--active'}`}>
+                    <span className="sa-status-badge__dot" />
+                    {selectedCompany.status || 'ACTIVE'}
+                  </span>
+                  <button
+                    onClick={() => { setSelectedCompany(null); setIsEditing(false); }}
+                    style={{
+                      background: 'transparent', border: 'none', color: 'var(--text-muted)',
+                      cursor: 'pointer', fontSize: '18px', padding: '2px 6px', lineHeight: 1
+                    }}
+                    title="Close"
+                  >
+                    ×
+                  </button>
+                </div>
               </div>
 
               {!isEditing ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div className="detail-field">
-                    <span className="detail-label">Name</span>
-                    <span className="detail-value">{selectedCompany.name}</span>
-                  </div>
-                  <div className="detail-field">
-                    <span className="detail-label">Email</span>
-                    <span className="detail-value">{selectedCompany.email}</span>
-                  </div>
-                  <div className="form-grid">
+                <div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+                    <div className="detail-field">
+                      <span className="detail-label">Name</span>
+                      <span className="detail-value">{selectedCompany.name}</span>
+                    </div>
+                    <div className="detail-field">
+                      <span className="detail-label">Email</span>
+                      <span className="detail-value">{selectedCompany.email}</span>
+                    </div>
                     <div className="detail-field">
                       <span className="detail-label">Phone</span>
                       <span className="detail-value">{selectedCompany.phone || 'N/A'}</span>
@@ -266,29 +334,28 @@ export default function SuperAdminDashboard() {
                       <span className="detail-label">Domain</span>
                       <span className="detail-value">{selectedCompany.domain || 'N/A'}</span>
                     </div>
-                  </div>
-                  <div className="detail-field">
-                    <span className="detail-label">Address</span>
-                    <span className="detail-value">
-                      {typeof selectedCompany.address === 'string' 
-                        ? selectedCompany.address 
-                        : selectedCompany.address 
-                          ? `${selectedCompany.address.street || ''}, ${selectedCompany.address.city || ''}, ${selectedCompany.address.state || ''}`
-                          : 'N/A'
-                      }
-                    </span>
+                    <div className="detail-field" style={{ gridColumn: '1 / -1' }}>
+                      <span className="detail-label">Address</span>
+                      <span className="detail-value">
+                        {typeof selectedCompany.address === 'string' 
+                          ? selectedCompany.address 
+                          : selectedCompany.address 
+                            ? `${selectedCompany.address.street || ''}, ${selectedCompany.address.city || ''}, ${selectedCompany.address.state || ''}`
+                            : 'N/A'
+                        }
+                      </span>
+                    </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-                    <Button onClick={() => setIsEditing(true)} style={{ flex: 1 }}>
-                      Edit Profile
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <Button onClick={() => setIsEditing(true)}>
+                      <Edit3 size={14} /> Edit Profile
                     </Button>
                     <Button 
-                      variant={selectedCompany.status === 'SUSPENDED' ? 'success' : 'danger'}
+                      variant={selectedCompany.status === 'SUSPENDED' ? 'primary' : 'danger'}
                       onClick={() => handleToggleStatus(selectedCompany)}
-                      style={{ flex: 1 }}
                     >
-                      {selectedCompany.status === 'SUSPENDED' ? 'Activate Tenant' : 'Suspend Tenant'}
+                      {selectedCompany.status === 'SUSPENDED' ? <><Power size={14} /> Activate Tenant</> : <><PowerOff size={14} /> Suspend Tenant</>}
                     </Button>
                   </div>
                 </div>
@@ -325,10 +392,10 @@ export default function SuperAdminDashboard() {
                   />
 
                   <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-                    <Button type="submit" loading={updateCompanyApi.loading} style={{ flex: 1 }}>
+                    <Button type="submit" loading={updateCompanyApi.loading}>
                       Save Changes
                     </Button>
-                    <Button type="button" variant="secondary" onClick={() => setIsEditing(false)} style={{ flex: 1 }}>
+                    <Button type="button" variant="secondary" onClick={() => setIsEditing(false)}>
                       Cancel
                     </Button>
                   </div>
@@ -338,6 +405,7 @@ export default function SuperAdminDashboard() {
           )}
         </div>
       )}
+
 
       {activeTab === 'create' && (
         <Card className="card-padded-lg" style={{ maxWidth: '600px' }}>
