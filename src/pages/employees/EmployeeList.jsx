@@ -28,6 +28,7 @@ export default function EmployeeList() {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [saving, setSaving] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [createdEmployeeCreds, setCreatedEmployeeCreds] = useState(null);
   const itemsPerPage = 8;
 
   // Form state
@@ -161,7 +162,14 @@ const departments = departmentsResponse?.departments || [];
         success('Employee details updated successfully!');
       } else {
         // Create mode
-        await employeeApi.create(payload);
+        const response = await employeeApi.create(payload);
+        const resData = response.data?.data ?? response.data;
+        if (resData?.temporaryPassword) {
+          setCreatedEmployeeCreds({
+            email: form.email,
+            temporaryPassword: resData.temporaryPassword
+          });
+        }
         success('Employee created successfully!');
       }
       setIsModalOpen(false);
@@ -469,6 +477,49 @@ const departments = departmentsResponse?.departments || [];
             <Button type="submit" loading={saving}>Save details</Button>
           </div>
         </form>
+      </Modal>
+
+      {/* Credentials Modal */}
+      <Modal
+        isOpen={!!createdEmployeeCreds}
+        onClose={() => setCreatedEmployeeCreds(null)}
+        title="Employee Account Created"
+        size="md"
+      >
+        <div className="flex flex-col gap-4 text-gray-900">
+          <p className="text-sm text-gray-600">
+            The employee's account has been successfully created. Please share the temporary login credentials below with the employee. They will be prompted to change their password upon logging in.
+          </p>
+          
+          <div className="bg-[#141414] border border-[#2A2A2A] rounded-lg p-5 flex flex-col gap-3 font-mono text-sm text-[#D6D3CC]">
+            <div className="flex justify-between items-center border-b border-[#2A2A2A] pb-2">
+              <span className="text-[#A8A6A0]">Login Email:</span>
+              <span className="text-[#F3F0E8] font-semibold">{createdEmployeeCreds?.email}</span>
+            </div>
+            <div className="flex justify-between items-center pt-1">
+              <span className="text-[#A8A6A0]">Temp Password:</span>
+              <div className="flex items-center gap-2">
+                <span className="text-[#C9A86A] font-bold tracking-wider">{createdEmployeeCreds?.temporaryPassword}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(createdEmployeeCreds?.temporaryPassword);
+                    success('Temporary password copied to clipboard!');
+                  }}
+                  className="px-2 py-1 text-xs bg-[#C9A86A] text-black font-sans font-medium rounded hover:bg-[#B89455] transition-all cursor-pointer"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end mt-2">
+            <Button onClick={() => setCreatedEmployeeCreds(null)} className="btn-primary">
+              Done
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

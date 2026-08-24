@@ -8,29 +8,28 @@ import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import Modal from '../../components/ui/Modal';
 import StatusBadge from '../../components/ui/StatusBadge';
-import { Plus, Calendar, Star, HelpCircle } from 'lucide-react';
+import { Plus, Calendar, Mail, Phone, Briefcase, HelpCircle } from 'lucide-react';
 
 export default function InterviewsPage() {
   const { success, error } = useToast();
 
   const [interviews, setInterviews] = useState([]);
-  const [candidates, setCandidates] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
   
   // Modals & Forms
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
-  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
-  const [selectedInterview, setSelectedInterview] = useState(null);
 
   const [scheduleForm, setScheduleForm] = useState({
-    candidate: '', round: 'SCREENING', interviewer: '',
-    scheduledDate: '', duration: 60, mode: 'ONLINE',
-    meetingLink: '', location: ''
-  });
-
-  const [feedbackForm, setFeedbackForm] = useState({
-    rating: 5, comments: '', recommendation: 'SELECT'
+    candidateName: '',
+    candidateEmail: '',
+    candidatePhone: '',
+    position: '',
+    interviewer: '',
+    interviewDate: '',
+    interviewTime: '',
+    interviewType: 'ONLINE',
+    status: 'SCHEDULED'
   });
 
   const loadData = async () => {
@@ -38,8 +37,6 @@ export default function InterviewsPage() {
     try {
       const intRes = await recruitmentApi.getInterviews();
       setInterviews(intRes.data?.data?.interviews || intRes.data?.interviews || intRes.interviews || []);
-      const candRes = await recruitmentApi.getCandidates();
-      setCandidates(candRes.data?.data?.candidates || candRes.data?.candidates || candRes.candidates || []);
       const empRes = await employeeApi.getAll({ status: 'ACTIVE' });
       setEmployees(empRes.data?.data?.employees || empRes.data?.employees || empRes.employees || []);
     } catch (err) {
@@ -59,21 +56,20 @@ export default function InterviewsPage() {
       await recruitmentApi.scheduleInterview(scheduleForm);
       success('Interview scheduled successfully');
       setIsScheduleOpen(false);
+      setScheduleForm({
+        candidateName: '',
+        candidateEmail: '',
+        candidatePhone: '',
+        position: '',
+        interviewer: '',
+        interviewDate: '',
+        interviewTime: '',
+        interviewType: 'ONLINE',
+        status: 'SCHEDULED'
+      });
       loadData();
     } catch (err) {
       error(err.response?.data?.message || 'Failed to schedule interview');
-    }
-  };
-
-  const handleFeedbackSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await recruitmentApi.submitFeedback(selectedInterview._id, feedbackForm);
-      success('Feedback submitted and round completed');
-      setIsFeedbackOpen(false);
-      loadData();
-    } catch (err) {
-      error(err.response?.data?.message || 'Failed to submit feedback');
     }
   };
 
@@ -91,8 +87,8 @@ export default function InterviewsPage() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Interviews Dashboard</h1>
-          <p className="page-subtitle">Schedule recruitment rounds, track interviewer allocations, and capture evaluations</p>
+          <h1 className="page-title">Candidate Interviews</h1>
+          <p className="page-subtitle">Schedule, track, and manage interviewer assignments for candidates</p>
         </div>
         <Button onClick={() => setIsScheduleOpen(true)}>
           <Plus size={15} /> Schedule Interview
@@ -112,10 +108,11 @@ export default function InterviewsPage() {
             <thead>
               <tr>
                 <th>Candidate</th>
-                <th>Round</th>
+                <th>Contact</th>
+                <th>Position</th>
                 <th>Interviewer</th>
                 <th>Date & Time</th>
-                <th>Mode</th>
+                <th>Type</th>
                 <th>Status</th>
                 <th style={{ textAlign: 'right' }}>Actions</th>
               </tr>
@@ -123,39 +120,42 @@ export default function InterviewsPage() {
             <tbody>
               {interviews.map((item) => (
                 <tr key={item._id}>
-                  <td style={{ fontWeight: 600 }}>
-                    {item.candidate ? `${item.candidate.firstName} ${item.candidate.lastName || ''}` : 'Unknown'}
+                  <td style={{ fontWeight: 600 }}>{item.candidateName}</td>
+                  <td>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '12px' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-secondary)' }}>
+                        <Mail size={12} /> {item.candidateEmail}
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-secondary)' }}>
+                        <Phone size={12} /> {item.candidatePhone}
+                      </span>
+                    </div>
                   </td>
-                  <td><span className="badge badge-info">{item.round}</span></td>
+                  <td>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 500 }}>
+                      <Briefcase size={13} style={{ opacity: 0.7 }} /> {item.position}
+                    </span>
+                  </td>
                   <td>{item.interviewer?.name || 'Assigned User'}</td>
-                  <td>{new Date(item.scheduledDate).toLocaleString()}</td>
-                  <td>{item.mode}</td>
+                  <td>
+                    <div style={{ display: 'flex', flexDirection: 'column', fontSize: '13px' }}>
+                      <span>{new Date(item.interviewDate).toLocaleDateString()}</span>
+                      <span style={{ color: 'var(--text-secondary)', fontSize: '11px' }}>{item.interviewTime}</span>
+                    </div>
+                  </td>
+                  <td><span className="badge badge-info">{item.interviewType}</span></td>
                   <td><StatusBadge status={item.status} /></td>
                   <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                      {item.status === 'SCHEDULED' && (
-                        <>
-                          <Button variant="success" onClick={() => { setSelectedInterview(item); setIsFeedbackOpen(true); }} style={{ padding: '4px 10px', height: '28px', fontSize: '12px' }}>
-                            Submit Feedback
-                          </Button>
-                          <select
-                            value={item.status}
-                            onChange={e => handleStatusChange(item._id, e.target.value)}
-                            className="input-field"
-                            style={{ height: '28px', width: '110px', fontSize: '11px', padding: '2px 6px' }}
-                          >
-                            <option value="SCHEDULED">Scheduled</option>
-                            <option value="CANCELLED">Cancel</option>
-                          </select>
-                        </>
-                      )}
-                      {item.status === 'COMPLETED' && item.feedback && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                          <Star size={12} className="text-yellow-500" style={{ fill: 'currentColor' }} />
-                          <span>{item.feedback.rating}/5 ({item.feedback.recommendation})</span>
-                        </div>
-                      )}
-                    </div>
+                    <select
+                      value={item.status}
+                      onChange={e => handleStatusChange(item._id, e.target.value)}
+                      className="input-field"
+                      style={{ height: '28px', width: '120px', fontSize: '11px', padding: '2px 6px' }}
+                    >
+                      <option value="SCHEDULED">Scheduled</option>
+                      <option value="COMPLETED">Completed</option>
+                      <option value="CANCELLED">Cancelled</option>
+                    </select>
                   </td>
                 </tr>
               ))}
@@ -165,79 +165,96 @@ export default function InterviewsPage() {
       )}
 
       {/* Schedule Interview Modal */}
-      <Modal isOpen={isScheduleOpen} onClose={() => setIsScheduleOpen(false)} title="Schedule Interview Round">
+      <Modal isOpen={isScheduleOpen} onClose={() => setIsScheduleOpen(false)} title="Schedule Candidate Interview">
         <form onSubmit={handleScheduleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label className="input-label" style={{ display: 'block', marginBottom: '6px' }}>Candidate</label>
-            <select required className="input-field" value={scheduleForm.candidate} onChange={e => setScheduleForm(prev => ({ ...prev, candidate: e.target.value }))}>
-              <option value="">Select Candidate</option>
-              {candidates.filter(c => c.stage !== 'HIRED' && c.stage !== 'REJECTED').map(c => (
-                <option key={c._id} value={c._id}>{c.firstName} {c.lastName || ''} ({c.jobTitle})</option>
-              ))}
-            </select>
-          </div>
           <div className="form-grid">
-            <div>
-              <label className="input-label" style={{ display: 'block', marginBottom: '6px' }}>Round</label>
-              <select className="input-field" value={scheduleForm.round} onChange={e => setScheduleForm(prev => ({ ...prev, round: e.target.value }))}>
-                {['SCREENING', 'TECHNICAL', 'MANAGERIAL', 'HR', 'FINAL'].map(r => (
-                  <option key={r} value={r}>{r}</option>
-                ))}
-              </select>
-            </div>
+            <Input
+              label="Candidate Name"
+              required
+              placeholder="e.g. John Doe"
+              value={scheduleForm.candidateName}
+              onChange={e => setScheduleForm(prev => ({ ...prev, candidateName: e.target.value }))}
+            />
+            <Input
+              type="email"
+              label="Candidate Email"
+              required
+              placeholder="e.g. john.doe@example.com"
+              value={scheduleForm.candidateEmail}
+              onChange={e => setScheduleForm(prev => ({ ...prev, candidateEmail: e.target.value }))}
+            />
+          </div>
+
+          <div className="form-grid">
+            <Input
+              label="Candidate Phone"
+              required
+              placeholder="e.g. +1 555-0199"
+              value={scheduleForm.candidatePhone}
+              onChange={e => setScheduleForm(prev => ({ ...prev, candidatePhone: e.target.value }))}
+            />
+            <Input
+              label="Position"
+              required
+              placeholder="e.g. Frontend Engineer"
+              value={scheduleForm.position}
+              onChange={e => setScheduleForm(prev => ({ ...prev, position: e.target.value }))}
+            />
+          </div>
+
+          <div className="form-grid">
             <div>
               <label className="input-label" style={{ display: 'block', marginBottom: '6px' }}>Interviewer (User)</label>
-              <select required className="input-field" value={scheduleForm.interviewer} onChange={e => setScheduleForm(prev => ({ ...prev, interviewer: e.target.value }))}>
+              <select
+                required
+                className="input-field"
+                value={scheduleForm.interviewer}
+                onChange={e => setScheduleForm(prev => ({ ...prev, interviewer: e.target.value }))}
+                style={{ width: '100%' }}
+              >
                 <option value="">Select Interviewer</option>
                 {employees.filter(e => e.user).map(e => (
-                  <option key={e.user._id} value={e.user._id}>{e.personalInfo.firstName} {e.personalInfo.lastName || ''} ({e.user.role})</option>
+                  <option key={e.user._id} value={e.user._id}>
+                    {e.personalInfo.firstName} {e.personalInfo.lastName || ''} ({e.user.role})
+                  </option>
                 ))}
               </select>
             </div>
-          </div>
-          <div className="form-grid">
-            <Input type="datetime-local" label="Scheduled Date & Time" required value={scheduleForm.scheduledDate} onChange={e => setScheduleForm(prev => ({ ...prev, scheduledDate: e.target.value }))} />
-            <Input type="number" label="Duration (Minutes)" value={scheduleForm.duration} onChange={e => setScheduleForm(prev => ({ ...prev, duration: Number(e.target.value) }))} />
-          </div>
-          <div className="form-grid">
             <div>
-              <label className="input-label" style={{ display: 'block', marginBottom: '6px' }}>Mode</label>
-              <select className="input-field" value={scheduleForm.mode} onChange={e => setScheduleForm(prev => ({ ...prev, mode: e.target.value }))}>
-                {['ONLINE', 'OFFLINE', 'PHONE'].map(m => <option key={m} value={m}>{m}</option>)}
+              <label className="input-label" style={{ display: 'block', marginBottom: '6px' }}>Interview Type</label>
+              <select
+                className="input-field"
+                value={scheduleForm.interviewType}
+                onChange={e => setScheduleForm(prev => ({ ...prev, interviewType: e.target.value }))}
+                style={{ width: '100%' }}
+              >
+                <option value="ONLINE">Online</option>
+                <option value="OFFLINE">Offline</option>
+                <option value="PHONE">Phone</option>
               </select>
             </div>
-            <Input label="Meeting Link (Online)" value={scheduleForm.meetingLink} onChange={e => setScheduleForm(prev => ({ ...prev, meetingLink: e.target.value }))} />
           </div>
-          {scheduleForm.mode === 'OFFLINE' && (
-            <Input label="Location" value={scheduleForm.location} onChange={e => setScheduleForm(prev => ({ ...prev, location: e.target.value }))} />
-          )}
+
+          <div className="form-grid">
+            <Input
+              type="date"
+              label="Interview Date"
+              required
+              value={scheduleForm.interviewDate}
+              onChange={e => setScheduleForm(prev => ({ ...prev, interviewDate: e.target.value }))}
+            />
+            <Input
+              type="time"
+              label="Interview Time"
+              required
+              value={scheduleForm.interviewTime}
+              onChange={e => setScheduleForm(prev => ({ ...prev, interviewTime: e.target.value }))}
+            />
+          </div>
+
           <Button type="submit">Schedule Interview</Button>
         </form>
       </Modal>
-
-      {/* Submit Feedback Modal */}
-      {selectedInterview && (
-        <Modal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} title={`Submit Interview Feedback: ${selectedInterview.candidate?.firstName || 'Candidate'}`}>
-          <form onSubmit={handleFeedbackSubmit} className="flex flex-col gap-4">
-            <div className="form-grid">
-              <div>
-                <label className="input-label" style={{ display: 'block', marginBottom: '6px' }}>Rating (1-5)</label>
-                <select className="input-field" value={feedbackForm.rating} onChange={e => setFeedbackForm(prev => ({ ...prev, rating: Number(e.target.value) }))}>
-                  {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="input-label" style={{ display: 'block', marginBottom: '6px' }}>Recommendation</label>
-                <select className="input-field" value={feedbackForm.recommendation} onChange={e => setFeedbackForm(prev => ({ ...prev, recommendation: e.target.value }))}>
-                  {['SELECT', 'REJECT', 'HOLD'].map(rec => <option key={rec} value={rec}>{rec}</option>)}
-                </select>
-              </div>
-            </div>
-            <Input label="Comments / Feedback Details" required placeholder="Describe performance, strengths, weaknesses..." value={feedbackForm.comments} onChange={e => setFeedbackForm(prev => ({ ...prev, comments: e.target.value }))} />
-            <Button type="submit" variant="success">Submit Feedback</Button>
-          </form>
-        </Modal>
-      )}
     </div>
   );
 }

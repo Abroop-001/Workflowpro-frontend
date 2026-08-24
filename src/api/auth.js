@@ -5,4 +5,5 @@ export const authApi = {
     register: (data) => api.post('/auth/register-company', data),
     logout: () => api.post('/auth/logout'),
     refreshToken: () => api.post('/auth/refresh-token'),
+    changePassword: (data) => api.post('/auth/change-password', data),
 };

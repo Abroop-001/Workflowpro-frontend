@@ -6,6 +6,7 @@ import AuthenticatedLayout from './layouts/AuthenticatedLayout';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ChangePassword from './pages/ChangePassword';
 import Dashboard from './pages/Dashboard';
 import EmployeeList from './pages/employees/EmployeeList';
 import EmployeeDetails from './pages/employees/EmployeeDetails';
@@ -17,10 +18,10 @@ import MyPayslips from './pages/self-service/MyPayslips';
 import DocumentsPage from './pages/documents/DocumentsPage';
 import NotificationsPage from './pages/self-service/NotificationsPage';
 import PayrollPage from './pages/payroll/PayrollPage';
-import RecruitmentPage from './pages/recruitment/RecruitmentPage';
 import InterviewsPage from './pages/recruitment/InterviewsPage';
 import PerformancePage from './pages/performance/PerformancePage';
 import ShiftsPage from './pages/shifts/ShiftsPage';
+import AuditLogsPage from './pages/audit-log/AuditLogsPage';
 import NotFound from './pages/NotFound';
 
 function ComingSoon({ title }) {
@@ -50,6 +51,7 @@ export default function App() {
 
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
+            <Route path="/change-password" element={<ChangePassword />} />
             <Route element={<AuthenticatedLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/employees" element={<EmployeeList />} />
@@ -62,11 +64,10 @@ export default function App() {
               <Route path="/documents" element={<DocumentsPage />} />
               <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/payroll" element={<PayrollPage />} />
-              <Route path="/recruitment" element={<RecruitmentPage />} />
               <Route path="/interviews" element={<InterviewsPage />} />
               <Route path="/shifts" element={<ShiftsPage />} />
               <Route path="/performance" element={<PerformancePage />} />
-              <Route path="/audit-logs" element={<ComingSoon title="Audit Logs" />} />
+              <Route path="/audit-logs" element={<AuditLogsPage />} />
             </Route>
           </Route>
 

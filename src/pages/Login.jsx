@@ -30,8 +30,12 @@ export default function Login() {
     }
     setLoading(true);
     try {
-      await login(form, rememberMe);
-      navigate(from, { replace: true });
+      const loggedInUser = await login(form, rememberMe);
+      if (loggedInUser?.mustChangePassword) {
+        navigate('/change-password', { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid email or password.');
     } finally {

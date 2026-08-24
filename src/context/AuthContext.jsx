@@ -32,6 +32,11 @@ function authReducer(state, action) {
         isAuthenticated: true,
         isLoading: false,
       };
+    case 'UPDATE_USER':
+      return {
+        ...state,
+        user: { ...state.user, ...action.payload },
+      };
     default:
       return state;
   }
@@ -95,6 +100,28 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  const updateUser = useCallback((updatedFields) => {
+    dispatch({ type: 'UPDATE_USER', payload: updatedFields });
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        localStorage.setItem('user', JSON.stringify({ ...user, ...updatedFields }));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    const sessUserStr = sessionStorage.getItem('user');
+    if (sessUserStr) {
+      try {
+        const user = JSON.parse(sessUserStr);
+        sessionStorage.setItem('user', JSON.stringify({ ...user, ...updatedFields }));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, []);
+
   const hasRole = useCallback(
     (...roles) => state.user && roles.includes(state.user.role),
     [state.user]
@@ -105,6 +132,7 @@ export function AuthProvider({ children }) {
     login,
     logout,
     hasRole,
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

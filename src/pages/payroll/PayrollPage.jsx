@@ -38,6 +38,7 @@ export default function PayrollPage() {
 
   // Form states
   const [generateForm, setGenerateForm] = useState({
+    employee: '',
     month: new Date().getMonth() + 1,
     year: new Date().getFullYear()
   });
@@ -112,6 +113,7 @@ export default function PayrollPage() {
   useEffect(() => {
     if (activeTab === 'payrolls') {
       loadPayrolls();
+      loadEmployees();
     } else if (activeTab === 'structures') {
       loadStructures();
       loadEmployees();
@@ -121,6 +123,10 @@ export default function PayrollPage() {
   // Actions
   const handleGeneratePayroll = async (e) => {
     e.preventDefault();
+    if (!generateForm.employee) {
+      error('Please select an employee.');
+      return;
+    }
     if (!window.confirm(`Generate payroll for Month: ${generateForm.month}, Year: ${generateForm.year}?`)) return;
     try {
       await generatePayrollApi.execute(generateForm);
@@ -290,6 +296,22 @@ export default function PayrollPage() {
                 <h3 style={{ fontSize: '14.5px', fontWeight: 600, margin: 0 }}>Process Monthly Payroll</h3>
               </div>
               <form onSubmit={handleGeneratePayroll} style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                <div style={{ width: '200px' }}>
+                  <select
+                    value={generateForm.employee}
+                    onChange={e => setGenerateForm(prev => ({ ...prev, employee: e.target.value }))}
+                    className="input-field"
+                    style={{ height: '38px' }}
+                    required
+                  >
+                    <option value="">-- Select Employee --</option>
+                    {employees && employees.map(emp => (
+                      <option key={emp._id} value={emp._id}>
+                        {emp.personalInfo?.firstName} {emp.personalInfo?.lastName} ({emp.employeeId})
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <div style={{ width: '130px' }}>
                   <select
                     value={generateForm.month}

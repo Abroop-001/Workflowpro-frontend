@@ -111,7 +111,6 @@ export default function AuthenticatedLayout() {
           { label: 'Leave approvals', path: '/leaves', icon: Calendar },
           { label: 'Payroll', path: '/payroll', icon: FileText },
           { label: 'Documents', path: '/documents', icon: FileText },
-          { label: 'Recruitment', path: '/recruitment', icon: Users },
           { label: 'Interviews', path: '/interviews', icon: Calendar },
           { label: 'Performance', path: '/performance', icon: Award },
           { label: 'Audit Logs', path: '/audit-logs', icon: Activity }
@@ -126,7 +125,6 @@ export default function AuthenticatedLayout() {
           { label: 'Leave approvals', path: '/leaves', icon: Calendar },
           { label: 'Payroll', path: '/payroll', icon: FileText },
           { label: 'Documents', path: '/documents', icon: FileText },
-          { label: 'Recruitment', path: '/recruitment', icon: Users },
           { label: 'Interviews', path: '/interviews', icon: Calendar },
           { label: 'Performance', path: '/performance', icon: Award }
         ];
@@ -136,7 +134,6 @@ export default function AuthenticatedLayout() {
           { label: 'Team Employees', path: '/employees', icon: Users },
           { label: 'Team Attendance', path: '/attendance', icon: Activity },
           { label: 'Leave approvals', path: '/leaves', icon: Calendar },
-          { label: 'Recruitment', path: '/recruitment', icon: Users },
           { label: 'Interviews', path: '/interviews', icon: Calendar },
           { label: 'Performance', path: '/performance', icon: Award }
         ];

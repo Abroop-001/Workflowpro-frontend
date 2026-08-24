@@ -19,6 +19,7 @@ export default function PerformancePage() {
   const isStaff = ['COMPANY_ADMIN', 'HR', 'MANAGER'].includes(user?.role);
   const [activeTab, setActiveTab] = useState(isStaff ? 'reviews' : 'self');
   const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState('');
   const [employees, setEmployees] = useState([]);
   
   // Reviews state
@@ -44,16 +45,35 @@ export default function PerformancePage() {
     goals: [{ title: '', description: '', status: 'PENDING' }]
   });
 
+  // Helper: safely extract an array from an axios response with nested data envelope
+  const extractArray = (res, key) => {
+    if (!res) return [];
+    // res.data.data[key]  — standard backend envelope { data: { [key]: [...] } }
+    const nested = res.data?.data?.[key];
+    if (Array.isArray(nested)) return nested;
+    // res.data[key]       — flat envelope { [key]: [...] }
+    const flat = res.data?.[key];
+    if (Array.isArray(flat)) return flat;
+    // res[key]            — already-unwrapped payload
+    const direct = res[key];
+    if (Array.isArray(direct)) return direct;
+    // last resort: if the payload itself is an array
+    if (Array.isArray(res.data)) return res.data;
+    if (Array.isArray(res)) return res;
+    return [];
+  };
+
   // Load My / Staff Reviews
   const loadReviews = async () => {
     setLoading(true);
+    setApiError('');
     try {
       if (isStaff) {
         const empRes = await employeeApi.getAll({ status: 'ACTIVE' });
-        setEmployees(empRes.employees || empRes.data || empRes.data?.employees || []);
+        setEmployees(extractArray(empRes, 'employees'));
         if (selectedEmpId) {
           const revRes = await performanceApi.getByEmployee(selectedEmpId);
-          setReviews(revRes.performances || revRes.data?.performances || revRes || []);
+          setReviews(extractArray(revRes, 'performances'));
         } else {
           setReviews([]);
         }
@@ -62,11 +82,13 @@ export default function PerformancePage() {
         const empId = profileRes.data?.data?.employee?._id || profileRes.data?.employee?._id;
         if (empId) {
           const revRes = await performanceApi.getByEmployee(empId);
-          setReviews(revRes.performances || revRes.data?.performances || revRes || []);
+          setReviews(extractArray(revRes, 'performances'));
         }
       }
     } catch (err) {
-      error('Failed to load performance reviews');
+      const msg = err.response?.data?.message || 'Failed to load performance reviews';
+      setApiError(msg);
+      error(msg);
     } finally {
       setLoading(false);
     }
@@ -188,10 +210,16 @@ export default function PerformancePage() {
 
       {loading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}><Spinner /></div>
+      ) : apiError ? (
+        <Card className="card-padded" style={{ textAlign: 'center', padding: '40px' }}>
+          <MessageSquare size={40} style={{ opacity: 0.3, marginBottom: '12px', color: 'var(--danger)' }} />
+          <p style={{ color: 'var(--danger)', fontWeight: 500, marginBottom: '12px' }}>{apiError}</p>
+          <Button variant="secondary" onClick={() => loadReviews()}>Retry</Button>
+        </Card>
       ) : reviews.length === 0 ? (
         <Card className="card-padded" style={{ textAlign: 'center', padding: '40px' }}>
           <Target size={40} style={{ opacity: 0.3, marginBottom: '12px' }} />
-          <p>{isStaff ? 'Please select an employee to view records.' : 'No performance reviews assigned yet.'}</p>
+          <p style={{ color: 'var(--text-secondary)' }}>{isStaff ? (selectedEmpId ? 'No performance reviews found for this employee.' : 'Please select an employee to view records.') : 'No performance reviews assigned yet.'}</p>
         </Card>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
