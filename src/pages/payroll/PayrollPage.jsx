@@ -86,7 +86,8 @@ export default function PayrollPage() {
   const loadPayrolls = async () => {
     try {
       const res = await fetchPayrollsApi.execute(payrollFilters);
-      setPayrolls(res.data?.data?.payrolls || res.data?.payrolls || res.payrolls || []);
+      const payrollList = Array.isArray(res) ? res : (res?.payrolls || []);
+      setPayrolls(payrollList);
     } catch (err) {
       error('Failed to load payroll list');
     }
@@ -95,7 +96,8 @@ export default function PayrollPage() {
   const loadStructures = async () => {
     try {
       const res = await fetchStructuresApi.execute();
-      setStructures(res.data?.data?.salaryStructures || res.data?.salaryStructures || res.salaryStructures || []);
+      const structureList = Array.isArray(res) ? res : (res?.salaryStructures || res?.salaries || []);
+      setStructures(structureList);
     } catch (err) {
       error('Failed to load salary structures');
     }
@@ -104,7 +106,9 @@ export default function PayrollPage() {
   const loadEmployees = async () => {
     try {
       const res = await employeeApi.getAll({ status: 'ACTIVE' });
-      setEmployees(res.data?.data || res.data || []);
+      const data = res.data?.data;
+      const empArray = Array.isArray(data) ? data : (data?.employees || []);
+      setEmployees(empArray);
     } catch (err) {
       console.error(err);
     }
@@ -384,9 +388,18 @@ export default function PayrollPage() {
 
               {fetchPayrollsApi.loading && payrolls.length === 0 ? (
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}><Spinner /></div>
+              ) : fetchPayrollsApi.error ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: 'var(--danger)' }}>
+                  <XCircle size={40} style={{ opacity: 0.3, marginBottom: '12px', margin: '0 auto' }} />
+                  <p style={{ margin: 0, fontWeight: 600 }}>Failed to load payroll list</p>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--text-secondary)' }}>{fetchPayrollsApi.error}</p>
+                  <Button variant="secondary" size="sm" onClick={loadPayrolls} style={{ marginTop: '12px', gap: '6px' }}>
+                    Retry
+                  </Button>
+                </div>
               ) : payrolls.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
-                  <DollarSign size={40} style={{ opacity: 0.3, marginBottom: '12px' }} />
+                  <DollarSign size={40} style={{ opacity: 0.3, marginBottom: '12px', margin: '0 auto' }} />
                   <p style={{ margin: 0 }}>No payroll records found for selected period.</p>
                 </div>
               ) : (
@@ -573,9 +586,18 @@ export default function PayrollPage() {
 
           {fetchStructuresApi.loading && structures.length === 0 ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}><Spinner /></div>
+          ) : fetchStructuresApi.error ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--danger)' }}>
+              <XCircle size={40} style={{ opacity: 0.3, marginBottom: '12px', margin: '0 auto' }} />
+              <p style={{ margin: 0, fontWeight: 600 }}>Failed to load salary structures</p>
+              <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--text-secondary)' }}>{fetchStructuresApi.error}</p>
+              <Button variant="secondary" size="sm" onClick={loadStructures} style={{ marginTop: '12px', gap: '6px' }}>
+                Retry
+              </Button>
+            </div>
           ) : structures.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
-              <DollarSign size={40} style={{ opacity: 0.3, marginBottom: '12px' }} />
+              <DollarSign size={40} style={{ opacity: 0.3, marginBottom: '12px', margin: '0 auto' }} />
               <p style={{ margin: 0 }}>No salary structures configured yet.</p>
             </div>
           ) : (

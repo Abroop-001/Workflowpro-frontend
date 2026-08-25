@@ -39,7 +39,7 @@ export default function MyPayslips() {
   if (loading) return <Loading />;
   if (fetchError) return <ErrorState message={fetchError} onRetry={refetch} />;
 
-  const list = payslips || [];
+  const list = Array.isArray(payslips) ? payslips : (payslips?.payslips || []);
 
   return (
     <div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useToast } from '../../context/ToastContext';
 import { useApi } from '../../hooks/useApi';
 import api from '../../api/axios';
@@ -6,11 +6,11 @@ import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
-import { Building, Plus, Search, Filter, Edit3, Power, PowerOff, Shield, Activity, CheckCircle2 } from 'lucide-react';
+import { Building, Search, Filter, Edit3, Power, PowerOff, Shield, Activity, CheckCircle2 } from 'lucide-react';
 
 export default function SuperAdminDashboard() {
   const { success, error } = useToast();
-  const [activeTab, setActiveTab] = useState('directory');
+  const detailsPanelRef = useRef(null);
   
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,14 +24,9 @@ export default function SuperAdminDashboard() {
     name: '', email: '', phone: '', address: '', domain: ''
   });
 
-  // States for creating company
-  const [newCompany, setNewCompany] = useState({
-    name: '', email: '', phone: '', address: '', domain: ''
-  });
-
   // APIs
   const fetchCompaniesApi = useApi((params) => api.get('/company', { params }));
-  const createCompanyApi = useApi((data) => api.post('/company', data));
+
   const updateCompanyApi = useApi((id, data) => api.patch(`/company/${id}`, data));
   const deactivateCompanyApi = useApi((id) => api.patch(`/company/${id}/deactivate`));
   const activateCompanyApi = useApi((id) => api.patch(`/company/${id}/activate`));
@@ -54,22 +49,7 @@ export default function SuperAdminDashboard() {
     loadCompanies();
   }, [searchQuery, statusFilter]);
 
-  const handleCreateCompany = async (e) => {
-    e.preventDefault();
-    if (!newCompany.name || !newCompany.email) {
-      error('Please fill in Name and Email.');
-      return;
-    }
-    try {
-      await createCompanyApi.execute(newCompany);
-      success('Company created successfully!');
-      setNewCompany({ name: '', email: '', phone: '', address: '', domain: '' });
-      setActiveTab('directory');
-      loadCompanies();
-    } catch (err) {
-      error(err.response?.data?.message || 'Failed to create company.');
-    }
-  };
+
 
   const handleSelectCompany = (company) => {
     setSelectedCompany(company);
@@ -81,6 +61,10 @@ export default function SuperAdminDashboard() {
       address: typeof company.address === 'string' ? company.address : company.address?.street || '',
       domain: company.domain || ''
     });
+    // Scroll to details panel after state update
+    setTimeout(() => {
+      detailsPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   };
 
   const handleUpdateCompany = async (e) => {
@@ -130,23 +114,8 @@ export default function SuperAdminDashboard() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="tabs">
-        <button 
-          className={`tab-btn ${activeTab === 'directory' ? 'active' : ''}`}
-          onClick={() => setActiveTab('directory')}
-        >
-          Company Directory
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'create' ? 'active' : ''}`}
-          onClick={() => setActiveTab('create')}
-        >
-          Register Company
-        </button>
-      </div>
-
-      {activeTab === 'directory' && (
+      {/* Company Directory */}
+      {(
         <div>
           {/* Search & Filter Bar */}
           <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -284,7 +253,7 @@ export default function SuperAdminDashboard() {
 
           {/* Details & Edit Panel (below grid) */}
           {selectedCompany && (
-            <Card className="card-padded-lg" style={{ marginTop: '24px' }}>
+            <Card ref={detailsPanelRef} className="card-padded-lg" style={{ marginTop: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div className="sa-company-card__avatar" style={{ width: '36px', height: '36px', fontSize: '13px' }}>
@@ -404,54 +373,6 @@ export default function SuperAdminDashboard() {
             </Card>
           )}
         </div>
-      )}
-
-
-      {activeTab === 'create' && (
-        <Card className="card-padded-lg" style={{ maxWidth: '600px' }}>
-          <h2 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '20px' }}>Register a New Company tenant</h2>
-          <form onSubmit={handleCreateCompany} className="flex flex-col gap-4">
-            <Input 
-              label="Company Name" 
-              placeholder="e.g. Acme Corp" 
-              required
-              value={newCompany.name} 
-              onChange={e => setNewCompany(prev => ({ ...prev, name: e.target.value }))} 
-            />
-            <Input 
-              label="Official Email Address" 
-              type="email"
-              placeholder="e.g. contact@acme.com" 
-              required
-              value={newCompany.email} 
-              onChange={e => setNewCompany(prev => ({ ...prev, email: e.target.value }))} 
-            />
-            <div className="form-grid">
-              <Input 
-                label="Phone" 
-                placeholder="+1 555-0199" 
-                value={newCompany.phone} 
-                onChange={e => setNewCompany(prev => ({ ...prev, phone: e.target.value }))} 
-              />
-              <Input 
-                label="Domain" 
-                placeholder="acme.com" 
-                value={newCompany.domain} 
-                onChange={e => setNewCompany(prev => ({ ...prev, domain: e.target.value }))} 
-              />
-            </div>
-            <Input 
-              label="Physical Address" 
-              placeholder="123 Main St, New York, NY" 
-              value={newCompany.address} 
-              onChange={e => setNewCompany(prev => ({ ...prev, address: e.target.value }))} 
-            />
-            
-            <Button type="submit" loading={createCompanyApi.loading} className="mt-2">
-              <Plus size={15} /> Register Company
-            </Button>
-          </form>
-        </Card>
       )}
     </div>
   );
