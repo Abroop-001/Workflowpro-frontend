@@ -40,7 +40,7 @@ export default function AuthenticatedLayout() {
     setLoadingNotifs(true);
     try {
       const res = await notificationApi.getAll({ limit: 5 });
-      setNotifications(res.data?.data || []);
+      setNotifications(res.data?.data?.notifications || res.data?.data || []);
       const countRes = await notificationApi.getUnreadCount();
       setUnreadCount(countRes.data?.data?.unreadCount || 0);
     } catch (err) {

@@ -34,7 +34,7 @@ export default function NotificationsPage() {
   if (loading) return <Loading />;
   if (fetchError) return <ErrorState message={fetchError} onRetry={refetch} />;
 
-  const list = notifications || [];
+  const list = notifications?.notifications || notifications || [];
 
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>

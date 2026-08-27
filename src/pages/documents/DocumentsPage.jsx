@@ -173,7 +173,7 @@ const employees = Array.isArray(employeesResponse)
   if (isEmployee) {
     if (selfLoading) return <Loading />;
     if (selfErr) return <ErrorState message={selfErr} onRetry={refetchSelf} />;
-    const list = selfDocs || [];
+    const list = selfDocs?.documents || selfDocs || [];
     return (
       <div>
         <div className="page-header">
